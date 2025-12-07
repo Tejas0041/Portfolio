@@ -5,6 +5,8 @@ import { HiMail, HiLocationMarker, HiPhone } from 'react-icons/hi'
 import { FaGithub, FaLinkedin, FaTwitter } from 'react-icons/fa'
 import axios from 'axios'
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000'
+
 const Contact = ({ profile, onToast }) => {
   const [formData, setFormData] = useState({
     name: '',
@@ -54,7 +56,7 @@ const Contact = ({ profile, onToast }) => {
     setLoading(true)
 
     try {
-      await axios.post('/api/contact', formData)
+      await axios.post(`${API_URL}/api/contact`, formData)
       onToast('Message sent successfully! I\'ll get back to you soon.', 'success')
       setFormData({ name: '', email: '', subject: '', message: '' })
     } catch (error) {
