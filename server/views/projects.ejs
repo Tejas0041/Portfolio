@@ -1,0 +1,134 @@
+<%- include('partials/header') %>
+<%- include('partials/sidebar') %>
+
+<main class="lg:ml-64 p-4 sm:p-6 lg:p-8 pt-16 lg:pt-8">
+  <h1 class="text-2xl sm:text-3xl font-bold mb-6 sm:mb-8">Manage Projects</h1>
+  
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+    <!-- Add/Edit Project Form -->
+    <div class="bg-dark-200 p-4 sm:p-6 rounded-xl h-fit">
+      <h2 class="text-xl font-semibold mb-4"><%= editProject ? 'Edit Project' : 'Add New Project' %></h2>
+      <form action="<%= editProject ? '/admin/projects/' + editProject._id : '/admin/projects' %>" method="POST" enctype="multipart/form-data" class="space-y-4">
+        <div>
+          <label class="block text-sm text-gray-400 mb-2">Title</label>
+          <input type="text" name="title" required value="<%= editProject?.title || '' %>"
+            class="w-full px-4 py-3 rounded-lg bg-dark-300 border border-gray-700 text-white focus:border-primary focus:outline-none">
+        </div>
+        <div>
+          <label class="block text-sm text-gray-400 mb-2">Description</label>
+          <textarea name="description" rows="3" required
+            class="w-full px-4 py-3 rounded-lg bg-dark-300 border border-gray-700 text-white focus:border-primary focus:outline-none"><%= editProject?.description || '' %></textarea>
+        </div>
+        <div>
+          <label class="block text-sm text-gray-400 mb-2">Project Image</label>
+          <% if (editProject?.image) { %>
+            <img src="<%= editProject.image %>" alt="Current" class="w-full h-32 object-cover rounded-lg mb-2">
+          <% } %>
+          <input type="file" name="image" accept="image/*"
+            class="block w-full text-sm text-gray-400
+            file:mr-4 file:py-2 file:px-4
+            file:rounded-lg file:border-0
+            file:text-sm file:font-semibold
+            file:bg-dark-100 file:text-primary
+            hover:file:bg-primary hover:file:text-white
+            file:cursor-pointer file:transition-colors">
+        </div>
+        <div>
+          <label class="block text-sm text-gray-400 mb-2">Tags (comma separated)</label>
+          <input type="text" name="tags" value="<%= editProject?.tags?.join(', ') || '' %>"
+            class="w-full px-4 py-3 rounded-lg bg-dark-300 border border-gray-700 text-white focus:border-primary focus:outline-none"
+            placeholder="React, Node.js, MongoDB">
+        </div>
+        <div>
+          <label class="block text-sm text-gray-400 mb-2">Category</label>
+          <select name="category"
+            class="w-full px-4 py-3 rounded-lg bg-dark-300 border border-gray-700 text-white focus:border-primary focus:outline-none">
+            <option value="fullstack" <%= editProject?.category === 'fullstack' ? 'selected' : '' %>>Full Stack</option>
+            <option value="frontend" <%= editProject?.category === 'frontend' ? 'selected' : '' %>>Frontend</option>
+            <option value="backend" <%= editProject?.category === 'backend' ? 'selected' : '' %>>Backend</option>
+            <option value="mobile" <%= editProject?.category === 'mobile' ? 'selected' : '' %>>Mobile</option>
+            <option value="other" <%= editProject?.category === 'other' ? 'selected' : '' %>>Other</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm text-gray-400 mb-2">GitHub URL</label>
+          <input type="url" name="github" value="<%= editProject?.github || '' %>"
+            class="w-full px-4 py-3 rounded-lg bg-dark-300 border border-gray-700 text-white focus:border-primary focus:outline-none">
+        </div>
+        <div>
+          <label class="block text-sm text-gray-400 mb-2">Live Demo URL</label>
+          <input type="url" name="live" value="<%= editProject?.live || '' %>"
+            class="w-full px-4 py-3 rounded-lg bg-dark-300 border border-gray-700 text-white focus:border-primary focus:outline-none">
+        </div>
+        <div>
+          <label class="block text-sm text-gray-400 mb-2">Order</label>
+          <input type="number" name="order" value="<%= editProject?.order || 0 %>"
+            class="w-full px-4 py-3 rounded-lg bg-dark-300 border border-gray-700 text-white focus:border-primary focus:outline-none">
+        </div>
+        <button type="submit" class="w-full py-3 bg-gradient-to-r from-primary to-secondary rounded-lg font-semibold">
+          <%= editProject ? 'Update Project' : 'Add Project' %>
+        </button>
+        <% if (editProject) { %>
+          <a href="/admin/projects" class="block text-center text-gray-400 hover:text-white">Cancel</a>
+        <% } %>
+      </form>
+    </div>
+    
+    <!-- Projects List -->
+    <div class="lg:col-span-2">
+      <div class="grid gap-4">
+        <% if (projects.length === 0) { %>
+          <div class="bg-dark-200 p-8 rounded-xl text-center text-gray-400">
+            No projects added yet. Add your first project!
+          </div>
+        <% } %>
+        <% projects.forEach(project => { %>
+          <div class="bg-dark-200 p-4 rounded-xl flex gap-4">
+            <% if (project.image) { %>
+              <img src="<%= project.image %>" alt="<%= project.title %>" class="w-24 h-24 object-cover rounded-lg">
+            <% } else { %>
+              <div class="w-24 h-24 bg-dark-100 rounded-lg flex items-center justify-center text-3xl">💼</div>
+            <% } %>
+            <div class="flex-1">
+              <h3 class="font-semibold text-lg"><%= project.title %></h3>
+              <p class="text-gray-400 text-sm line-clamp-2"><%= project.description %></p>
+              <div class="flex gap-2 mt-2">
+                <% project.tags.slice(0, 3).forEach(tag => { %>
+                  <span class="px-2 py-1 text-xs rounded bg-primary/20 text-primary"><%= tag %></span>
+                <% }) %>
+              </div>
+            </div>
+            <div class="flex flex-col gap-2">
+              <a href="/admin/projects/<%= project._id %>/edit" class="px-4 py-2 bg-primary/20 text-primary rounded-lg hover:bg-primary/30 text-center">
+                Edit
+              </a>
+              <button type="button" onclick="confirmDelete('/admin/projects/<%= project._id %>/delete', 'project')" class="w-full px-4 py-2 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30">
+                Delete
+              </button>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+  function confirmDelete(url, type) {
+    showConfirmModal(
+      'Confirm Deletion',
+      `Are you sure you want to delete this ${type}? This action cannot be undone.`,
+      () => {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = url;
+        document.body.appendChild(form);
+        form.submit();
+      },
+      'Delete',
+      'bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700'
+    );
+  }
+</script>
+
+<%- include('partials/footer') %>

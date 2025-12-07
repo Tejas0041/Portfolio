@@ -1,0 +1,55 @@
+<!-- Confirmation Modal -->
+<div id="confirmModal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+  <div class="bg-dark-200 rounded-2xl p-6 max-w-md w-full border border-gray-700 shadow-2xl">
+    <h3 id="confirmTitle" class="text-xl font-semibold text-white mb-3"></h3>
+    <p id="confirmMessage" class="text-gray-400 mb-6"></p>
+    <div class="flex gap-3 justify-end">
+      <button onclick="closeConfirmModal()" class="px-6 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 text-white transition-colors">
+        Cancel
+      </button>
+      <button id="confirmButton" class="px-6 py-2 rounded-lg bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white transition-all">
+        Confirm
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  let confirmCallback = null;
+
+  function showConfirmModal(title, message, onConfirm, buttonText = 'Confirm', buttonClass = 'bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700') {
+    document.getElementById('confirmTitle').textContent = title;
+    document.getElementById('confirmMessage').textContent = message;
+    const confirmBtn = document.getElementById('confirmButton');
+    confirmBtn.textContent = buttonText;
+    confirmBtn.className = `px-6 py-2 rounded-lg text-white transition-all ${buttonClass}`;
+    confirmCallback = onConfirm;
+    document.getElementById('confirmModal').classList.remove('hidden');
+  }
+
+  function closeConfirmModal() {
+    document.getElementById('confirmModal').classList.add('hidden');
+    confirmCallback = null;
+  }
+
+  document.getElementById('confirmButton').addEventListener('click', () => {
+    if (confirmCallback) {
+      confirmCallback();
+    }
+    closeConfirmModal();
+  });
+
+  // Close on backdrop click
+  document.getElementById('confirmModal').addEventListener('click', (e) => {
+    if (e.target.id === 'confirmModal') {
+      closeConfirmModal();
+    }
+  });
+
+  // Close on Escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !document.getElementById('confirmModal').classList.contains('hidden')) {
+      closeConfirmModal();
+    }
+  });
+</script>

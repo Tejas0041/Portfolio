@@ -1,0 +1,84 @@
+<%- include('partials/header') %>
+<%- include('partials/sidebar') %>
+
+<main class="lg:ml-64 p-4 sm:p-6 lg:p-8 pt-16 lg:pt-8">
+  <h1 class="text-3xl font-bold mb-8">Dashboard</h1>
+  
+  <!-- Stats Cards -->
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 mb-8">
+    <div class="bg-dark-200 p-6 rounded-xl">
+      <div class="text-4xl mb-2">💼</div>
+      <div class="text-2xl font-bold"><%= projects.length %></div>
+      <div class="text-gray-400">Projects</div>
+    </div>
+    <div class="bg-dark-200 p-6 rounded-xl">
+      <div class="text-4xl mb-2">🛠️</div>
+      <div class="text-2xl font-bold"><%= skills.length %></div>
+      <div class="text-gray-400">Skills</div>
+    </div>
+    <div class="bg-dark-200 p-6 rounded-xl">
+      <div class="text-4xl mb-2">💻</div>
+      <div class="text-2xl font-bold"><%= profile.codingProfiles?.length || 0 %></div>
+      <div class="text-gray-400">Coding Profiles</div>
+    </div>
+    <div class="bg-dark-200 p-6 rounded-xl">
+      <div class="text-4xl mb-2">📬</div>
+      <div class="text-2xl font-bold"><%= unreadCount %></div>
+      <div class="text-gray-400">Unread Messages</div>
+    </div>
+  </div>
+  
+  <!-- Quick Actions -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+    <div class="bg-dark-200 p-6 rounded-xl">
+      <h2 class="text-xl font-semibold mb-4">Quick Actions</h2>
+      <div class="space-y-3">
+        <a href="/admin/profile" class="block px-4 py-3 bg-dark-100 rounded-lg hover:bg-primary/20 transition-colors">
+          ✏️ Update Profile
+        </a>
+        <a href="/admin/projects" class="block px-4 py-3 bg-dark-100 rounded-lg hover:bg-primary/20 transition-colors">
+          ➕ Add New Project
+        </a>
+        <a href="/admin/skills" class="block px-4 py-3 bg-dark-100 rounded-lg hover:bg-primary/20 transition-colors">
+          🛠️ Manage Skills
+        </a>
+      </div>
+    </div>
+    
+    <div class="bg-dark-200 p-6 rounded-xl">
+      <h2 class="text-xl font-semibold mb-4">Recent Messages</h2>
+      <% if (messages.length === 0) { %>
+        <p class="text-gray-400">No messages yet</p>
+      <% } else { %>
+        <div class="space-y-3">
+          <% messages.forEach(msg => { %>
+            <div class="px-4 py-3 bg-dark-100 rounded-lg <%= !msg.read ? 'border-l-4 border-primary' : '' %>">
+              <div class="font-medium"><%= msg.name %></div>
+              <div class="text-sm text-gray-400 truncate"><%= msg.subject %></div>
+            </div>
+          <% }) %>
+        </div>
+        <a href="/admin/messages" class="block text-center text-primary mt-4 hover:underline">View All →</a>
+      <% } %>
+    </div>
+  </div>
+  
+  <!-- Profile Preview -->
+  <div class="bg-dark-200 p-6 rounded-xl">
+    <h2 class="text-xl font-semibold mb-4">Profile Preview</h2>
+    <div class="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
+      <% if (profile.profileImage) { %>
+        <img src="<%= profile.profileImage %>" alt="Profile" class="w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover">
+      <% } else { %>
+        <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-dark-100 flex items-center justify-center text-3xl sm:text-4xl">👤</div>
+      <% } %>
+      <div class="text-center sm:text-left">
+        <h3 class="text-xl sm:text-2xl font-bold"><%= profile.name || 'Not set' %></h3>
+        <p class="text-gray-400 text-sm sm:text-base"><%= profile.title || 'Not set' %></p>
+        <p class="text-gray-500 text-sm"><%= profile.email || 'Email not set' %></p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<%- include('partials/footer') %>

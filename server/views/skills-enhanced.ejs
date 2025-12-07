@@ -1,0 +1,244 @@
+<%- include('partials/header') %>
+<%- include('partials/sidebar') %>
+
+<main class="lg:ml-64 p-4 sm:p-6 lg:p-8 pt-16 lg:pt-8">
+  <h1 class="text-2xl sm:text-3xl font-bold mb-6 sm:mb-8">Manage Skills</h1>
+  
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+    <!-- Add Skill Form -->
+    <div class="bg-dark-200 p-4 sm:p-6 rounded-xl h-fit">
+      <h2 class="text-xl font-semibold mb-4">Add New Skill</h2>
+      <form action="/admin/skills" method="POST" class="space-y-4">
+        <div>
+          <label class="block text-sm text-gray-400 mb-2">Skill Name</label>
+          <input type="text" name="name" required id="skillName"
+            class="w-full px-4 py-3 rounded-lg bg-dark-300 border border-gray-700 text-white focus:border-primary focus:outline-none"
+            placeholder="e.g., React">
+        </div>
+        
+        <div>
+          <label class="block text-sm text-gray-400 mb-2">Category</label>
+          <select name="category" required
+            class="w-full px-4 py-3 rounded-lg bg-dark-300 border border-gray-700 text-white focus:border-primary focus:outline-none">
+            <option value="frontend">Frontend</option>
+            <option value="backend">Backend</option>
+            <option value="languages">Languages</option>
+            <option value="tools">Tools & Others</option>
+          </select>
+        </div>
+        
+        <div>
+          <label class="block text-sm text-gray-400 mb-2">Icon</label>
+          <input type="text" name="icon" id="iconInput" readonly
+            class="w-full px-4 py-3 rounded-lg bg-dark-300 border border-gray-700 text-white focus:border-primary focus:outline-none cursor-pointer"
+            placeholder="Click to select icon"
+            onclick="document.getElementById('iconModal').classList.remove('hidden')">
+          <p class="text-xs text-gray-500 mt-1">Click to open icon picker</p>
+        </div>
+        
+        <input type="hidden" name="color" id="colorInput" value="#6366f1">
+        <input type="hidden" id="colorPicker" value="#6366f1">
+        
+        <div>
+          <label class="block text-sm text-gray-400 mb-2">Order</label>
+          <input type="number" name="order" value="0"
+            class="w-full px-4 py-3 rounded-lg bg-dark-300 border border-gray-700 text-white focus:border-primary focus:outline-none">
+        </div>
+        
+        <button type="submit" class="w-full py-3 bg-gradient-to-r from-primary to-secondary rounded-lg font-semibold">
+          Add Skill
+        </button>
+      </form>
+    </div>
+    
+    <!-- Skills List -->
+    <div class="lg:col-span-2 space-y-6">
+      <% const categories = ['frontend', 'backend', 'languages', 'tools'] %>
+      <% categories.forEach(cat => { %>
+        <div class="bg-dark-200 p-6 rounded-xl">
+          <h2 class="text-xl font-semibold mb-4 capitalize"><%= cat %></h2>
+          <div class="flex flex-wrap gap-3">
+            <% skills.filter(s => s.category === cat).forEach(skill => { %>
+              <div class="flex items-center gap-2 px-4 py-2 rounded-full bg-dark-100 group relative">
+                <span style="color: <%= skill.color %>">●</span>
+                <span><%= skill.name %></span>
+                <div class="flex gap-1 ml-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button type="button" onclick="confirmDelete('/admin/skills/<%= skill._id %>/delete', 'skill')" class="text-red-400 hover:text-red-300">✕</button>
+                </div>
+              </div>
+            <% }) %>
+            <% if (skills.filter(s => s.category === cat).length === 0) { %>
+              <p class="text-gray-500">No skills added yet</p>
+            <% } %>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  </div>
+</main>
+
+<!-- Icon Picker Modal -->
+<div id="iconModal" class="hidden fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
+  <div class="bg-dark-200 rounded-2xl max-w-4xl w-full max-h-[80vh] overflow-hidden flex flex-col">
+    <div class="p-6 border-b border-gray-700">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-xl font-semibold">Select Icon</h3>
+        <button onclick="document.getElementById('iconModal').classList.add('hidden')" class="text-gray-400 hover:text-white">✕</button>
+      </div>
+      <input type="text" id="iconSearch" placeholder="Search icons..." 
+        class="w-full px-4 py-3 rounded-lg bg-dark-300 border border-gray-700 text-white focus:border-primary focus:outline-none"
+        oninput="filterIcons()">
+    </div>
+    <div id="iconGrid" class="p-6 overflow-y-auto grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3">
+      <!-- Icons will be populated by JavaScript -->
+    </div>
+  </div>
+</div>
+
+<script>
+  // Popular tech icons with their official brand colors
+  const icons = {
+    'SiReact': { name: 'React', color: '#61DAFB' },
+    'SiNodedotjs': { name: 'Node.js', color: '#339933' },
+    'SiJavascript': { name: 'JavaScript', color: '#F7DF1E' },
+    'SiTypescript': { name: 'TypeScript', color: '#3178C6' },
+    'SiPython': { name: 'Python', color: '#3776AB' },
+    'SiJava': { name: 'Java', color: '#007396' },
+    'SiCplusplus': { name: 'C++', color: '#00599C' },
+    'SiC': { name: 'C', color: '#A8B9CC' },
+    'SiGo': { name: 'Go', color: '#00ADD8' },
+    'SiRust': { name: 'Rust', color: '#000000' },
+    'SiPhp': { name: 'PHP', color: '#777BB4' },
+    'SiRuby': { name: 'Ruby', color: '#CC342D' },
+    'SiHtml5': { name: 'HTML5', color: '#E34F26' },
+    'SiCss3': { name: 'CSS3', color: '#1572B6' },
+    'SiSass': { name: 'Sass', color: '#CC6699' },
+    'SiTailwindcss': { name: 'Tailwind', color: '#06B6D4' },
+    'SiBootstrap': { name: 'Bootstrap', color: '#7952B3' },
+    'SiNextdotjs': { name: 'Next.js', color: '#000000' },
+    'SiVuedotjs': { name: 'Vue.js', color: '#4FC08D' },
+    'SiAngular': { name: 'Angular', color: '#DD0031' },
+    'SiSvelte': { name: 'Svelte', color: '#FF3E00' },
+    'SiNuxtdotjs': { name: 'Nuxt.js', color: '#00DC82' },
+    'SiExpress': { name: 'Express', color: '#000000' },
+    'SiNestjs': { name: 'NestJS', color: '#E0234E' },
+    'SiDjango': { name: 'Django', color: '#092E20' },
+    'SiFlask': { name: 'Flask', color: '#000000' },
+    'SiSpring': { name: 'Spring', color: '#6DB33F' },
+    'SiMongodb': { name: 'MongoDB', color: '#47A248' },
+    'SiPostgresql': { name: 'PostgreSQL', color: '#4169E1' },
+    'SiMysql': { name: 'MySQL', color: '#4479A1' },
+    'SiRedis': { name: 'Redis', color: '#DC382D' },
+    'SiSqlite': { name: 'SQLite', color: '#003B57' },
+    'SiFirebase': { name: 'Firebase', color: '#FFCA28' },
+    'SiSupabase': { name: 'Supabase', color: '#3ECF8E' },
+    'SiGraphql': { name: 'GraphQL', color: '#E10098' },
+    'SiApollographql': { name: 'Apollo', color: '#311C87' },
+    'SiDocker': { name: 'Docker', color: '#2496ED' },
+    'SiKubernetes': { name: 'Kubernetes', color: '#326CE5' },
+    'SiGit': { name: 'Git', color: '#F05032' },
+    'SiGithub': { name: 'GitHub', color: '#181717' },
+    'SiGitlab': { name: 'GitLab', color: '#FC6D26' },
+    'SiAmazonaws': { name: 'AWS', color: '#FF9900' },
+    'SiGooglecloud': { name: 'GCP', color: '#4285F4' },
+    'SiMicrosoftazure': { name: 'Azure', color: '#0078D4' },
+    'SiVercel': { name: 'Vercel', color: '#000000' },
+    'SiNetlify': { name: 'Netlify', color: '#00C7B7' },
+    'SiLinux': { name: 'Linux', color: '#FCC624' },
+    'SiUbuntu': { name: 'Ubuntu', color: '#E95420' },
+    'SiWindows': { name: 'Windows', color: '#0078D6' },
+    'SiApple': { name: 'Apple', color: '#000000' },
+    'SiVisualstudiocode': { name: 'VS Code', color: '#007ACC' },
+    'SiIntellijidea': { name: 'IntelliJ', color: '#000000' },
+    'SiPycharm': { name: 'PyCharm', color: '#000000' },
+    'SiVim': { name: 'Vim', color: '#019733' },
+    'SiNpm': { name: 'npm', color: '#CB3837' },
+    'SiYarn': { name: 'Yarn', color: '#2C8EBB' },
+    'SiWebpack': { name: 'Webpack', color: '#8DD6F9' },
+    'SiVite': { name: 'Vite', color: '#646CFF' },
+    'SiBabel': { name: 'Babel', color: '#F9DC3E' },
+    'SiJest': { name: 'Jest', color: '#C21325' },
+    'SiCypress': { name: 'Cypress', color: '#17202C' },
+    'SiPlaywright': { name: 'Playwright', color: '#2EAD33' },
+    'SiSelenium': { name: 'Selenium', color: '#43B02A' },
+    'SiRedux': { name: 'Redux', color: '#764ABC' },
+    'SiReactrouter': { name: 'React Router', color: '#CA4245' },
+    'SiFramer': { name: 'Framer', color: '#0055FF' },
+    'SiStyledcomponents': { name: 'Styled Components', color: '#DB7093' },
+    'SiPostman': { name: 'Postman', color: '#FF6C37' },
+    'SiInsomnia': { name: 'Insomnia', color: '#4000BF' },
+    'SiSwagger': { name: 'Swagger', color: '#85EA2D' },
+    'SiFigma': { name: 'Figma', color: '#F24E1E' },
+    'SiAdobexd': { name: 'Adobe XD', color: '#FF61F6' }
+  };
+
+  // Populate icon grid with brand colors
+  const iconGrid = document.getElementById('iconGrid');
+  Object.entries(icons).forEach(([iconKey, iconData]) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'p-3 rounded-lg bg-dark-100 hover:bg-dark-300 transition-colors flex flex-col items-center justify-center gap-1 text-center';
+    
+    btn.innerHTML = `
+      <div class="w-10 h-10 rounded-lg flex items-center justify-center font-bold text-sm" style="background-color: ${iconData.color}20; color: ${iconData.color}">
+        ${iconData.name.substring(0, 2).toUpperCase()}
+      </div>
+      <span class="text-xs text-gray-400">${iconData.name}</span>
+    `;
+    btn.dataset.icon = iconKey;
+    btn.dataset.color = iconData.color;
+    btn.dataset.name = iconData.name;
+    btn.onclick = () => selectIcon(iconKey, iconData.color);
+    iconGrid.appendChild(btn);
+  });
+
+  function selectIcon(icon, color) {
+    document.getElementById('iconInput').value = icon;
+    document.getElementById('colorInput').value = color;
+    document.getElementById('colorPicker').value = color;
+    document.getElementById('iconModal').classList.add('hidden');
+    document.getElementById('iconSearch').value = '';
+    filterIcons();
+  }
+
+  function filterIcons() {
+    const search = document.getElementById('iconSearch').value.toLowerCase();
+    const buttons = iconGrid.querySelectorAll('button');
+    buttons.forEach(btn => {
+      const icon = btn.dataset.icon.toLowerCase();
+      const name = btn.dataset.name.toLowerCase();
+      btn.style.display = (icon.includes(search) || name.includes(search)) ? 'flex' : 'none';
+    });
+  }
+
+  // Color picker sync
+  document.getElementById('colorPicker').addEventListener('input', (e) => {
+    document.getElementById('colorInput').value = e.target.value;
+  });
+  
+  document.getElementById('colorInput').addEventListener('input', (e) => {
+    if (/^#[0-9A-F]{6}$/i.test(e.target.value)) {
+      document.getElementById('colorPicker').value = e.target.value;
+    }
+  });
+</script>
+
+<script>
+  function confirmDelete(url, type) {
+    showConfirmModal(
+      'Confirm Deletion',
+      `Are you sure you want to delete this ${type}? This action cannot be undone.`,
+      () => {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = url;
+        document.body.appendChild(form);
+        form.submit();
+      },
+      'Delete',
+      'bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700'
+    );
+  }
+</script>
+
+<%- include('partials/footer') %>

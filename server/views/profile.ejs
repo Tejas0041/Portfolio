@@ -1,0 +1,141 @@
+<%- include('partials/header') %>
+<%- include('partials/sidebar') %>
+
+<main class="lg:ml-64 p-4 sm:p-6 lg:p-8 pt-16 lg:pt-8">
+  <h1 class="text-2xl sm:text-3xl font-bold mb-6 sm:mb-8">Profile Settings</h1>
+  
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+    <!-- Image & Resume Upload -->
+    <div class="space-y-6">
+      <div class="bg-dark-200 p-6 rounded-xl">
+        <h2 class="text-xl font-semibold mb-4">Profile Image</h2>
+        <% if (profile.profileImage) { %>
+          <img src="<%= profile.profileImage %>" alt="Profile" class="w-32 h-32 rounded-full object-cover mx-auto mb-4">
+        <% } else { %>
+          <div class="w-32 h-32 rounded-full bg-dark-100 flex items-center justify-center text-5xl mx-auto mb-4">👤</div>
+        <% } %>
+        <form action="/admin/profile/image" method="POST" enctype="multipart/form-data">
+          <label class="block w-full mb-3">
+            <span class="sr-only">Choose profile image</span>
+            <input type="file" name="image" accept="image/*" required 
+              class="block w-full text-sm text-gray-400
+              file:mr-4 file:py-2 file:px-4
+              file:rounded-lg file:border-0
+              file:text-sm file:font-semibold
+              file:bg-dark-100 file:text-primary
+              hover:file:bg-primary hover:file:text-white
+              file:cursor-pointer file:transition-colors">
+          </label>
+          <button type="submit" class="w-full py-2 bg-primary rounded-lg hover:bg-primary/80 transition-colors">
+            Upload Image
+          </button>
+        </form>
+      </div>
+      
+      <div class="bg-dark-200 p-6 rounded-xl">
+        <h2 class="text-xl font-semibold mb-4">Resume Link</h2>
+        <p class="text-gray-400 text-sm mb-4">Add Google Drive or external resume link (recommended for inline viewing)</p>
+        <form action="/admin/profile/resume-link" method="POST">
+          <input type="url" name="resumeLink" value="<%= profile.resumeLink || '' %>" 
+            placeholder="https://drive.google.com/file/d/..."
+            class="w-full px-4 py-3 rounded-lg bg-dark-300 border border-gray-700 text-white focus:border-secondary focus:outline-none mb-3">
+          <button type="submit" class="w-full py-2 bg-secondary rounded-lg hover:bg-secondary/80 transition-colors">
+            Save Resume Link
+          </button>
+        </form>
+        <% if (profile.resumeLink) { %>
+          <a href="<%= profile.resumeLink %>" target="_blank" class="block text-center text-secondary hover:underline mt-3 text-sm">
+            View Current Resume →
+          </a>
+        <% } %>
+      </div>
+    </div>
+    
+    <!-- Main Form -->
+    <div class="lg:col-span-2">
+      <form action="/admin/profile" method="POST" class="bg-dark-200 p-6 rounded-xl space-y-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm text-gray-400 mb-2">Full Name</label>
+            <input type="text" name="name" value="<%= profile.name || '' %>" 
+              class="w-full px-4 py-3 rounded-lg bg-dark-300 border border-gray-700 text-white focus:border-primary focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-sm text-gray-400 mb-2">Title</label>
+            <input type="text" name="title" value="<%= profile.title || '' %>" 
+              class="w-full px-4 py-3 rounded-lg bg-dark-300 border border-gray-700 text-white focus:border-primary focus:outline-none">
+          </div>
+        </div>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm text-gray-400 mb-2">Email</label>
+            <input type="email" name="email" value="<%= profile.email || '' %>" 
+              class="w-full px-4 py-3 rounded-lg bg-dark-300 border border-gray-700 text-white focus:border-primary focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-sm text-gray-400 mb-2">Phone</label>
+            <input type="text" name="phone" value="<%= profile.phone || '' %>" 
+              class="w-full px-4 py-3 rounded-lg bg-dark-300 border border-gray-700 text-white focus:border-primary focus:outline-none">
+          </div>
+        </div>
+        
+        <div>
+          <label class="block text-sm text-gray-400 mb-2">Location</label>
+          <input type="text" name="location" value="<%= profile.location || '' %>" 
+            class="w-full px-4 py-3 rounded-lg bg-dark-300 border border-gray-700 text-white focus:border-primary focus:outline-none">
+        </div>
+        
+        <div>
+          <label class="block text-sm text-gray-400 mb-2">Short Bio (for hero section)</label>
+          <textarea name="bio" rows="2" 
+            class="w-full px-4 py-3 rounded-lg bg-dark-300 border border-gray-700 text-white focus:border-primary focus:outline-none"><%= profile.bio || '' %></textarea>
+        </div>
+        
+        <div>
+          <label class="block text-sm text-gray-400 mb-2">About Text (detailed)</label>
+          <textarea name="aboutText" rows="4" 
+            class="w-full px-4 py-3 rounded-lg bg-dark-300 border border-gray-700 text-white focus:border-primary focus:outline-none"><%= profile.aboutText || '' %></textarea>
+        </div>
+        
+        <div>
+          <label class="block text-sm text-gray-400 mb-2">Typing Animation Texts (comma separated)</label>
+          <input type="text" name="typingTexts" value="<%= profile.typingTexts?.join(', ') || '' %>" 
+            placeholder="Full Stack Developer, Problem Solver, B.Tech @ IIEST"
+            class="w-full px-4 py-3 rounded-lg bg-dark-300 border border-gray-700 text-white focus:border-primary focus:outline-none">
+        </div>
+        
+        <h3 class="text-lg font-semibold pt-4 border-t border-gray-700">Social Links</h3>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm text-gray-400 mb-2">GitHub URL</label>
+            <input type="url" name="socials[github]" value="<%= profile.socials?.github || '' %>" 
+              class="w-full px-4 py-3 rounded-lg bg-dark-300 border border-gray-700 text-white focus:border-primary focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-sm text-gray-400 mb-2">LinkedIn URL</label>
+            <input type="url" name="socials[linkedin]" value="<%= profile.socials?.linkedin || '' %>" 
+              class="w-full px-4 py-3 rounded-lg bg-dark-300 border border-gray-700 text-white focus:border-primary focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-sm text-gray-400 mb-2">Twitter URL</label>
+            <input type="url" name="socials[twitter]" value="<%= profile.socials?.twitter || '' %>" 
+              class="w-full px-4 py-3 rounded-lg bg-dark-300 border border-gray-700 text-white focus:border-primary focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-sm text-gray-400 mb-2">Instagram URL</label>
+            <input type="url" name="socials[instagram]" value="<%= profile.socials?.instagram || '' %>" 
+              class="w-full px-4 py-3 rounded-lg bg-dark-300 border border-gray-700 text-white focus:border-primary focus:outline-none">
+          </div>
+        </div>
+        
+        <button type="submit" class="w-full py-3 bg-gradient-to-r from-primary to-secondary rounded-lg font-semibold hover:opacity-90 transition-opacity">
+          Save Profile
+        </button>
+      </form>
+    </div>
+  </div>
+</main>
+
+<%- include('partials/footer') %>

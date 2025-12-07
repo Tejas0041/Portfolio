@@ -1,0 +1,81 @@
+<!-- Mobile Menu Button -->
+<button id="mobileMenuBtn" onclick="toggleSidebar()" class="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-dark-200 text-white">
+  <svg id="menuIcon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+  </svg>
+  <svg id="closeIcon" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+  </svg>
+</button>
+
+<!-- Overlay -->
+<div id="sidebarOverlay" onclick="toggleSidebar()" class="hidden lg:hidden fixed inset-0 bg-black/50 z-30"></div>
+
+<!-- Sidebar -->
+<aside id="sidebar" class="w-64 bg-dark-200 min-h-screen p-6 fixed left-0 top-0 z-40 transform -translate-x-full lg:translate-x-0 transition-transform duration-300">
+  <div class="mb-8 flex items-center justify-between">
+    <h1 class="text-xl lg:text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+      Admin Panel
+    </h1>
+    <button onclick="toggleSidebar()" class="lg:hidden text-gray-400 hover:text-white">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+      </svg>
+    </button>
+  </div>
+  
+  <nav class="space-y-2">
+    <a href="/admin" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-dark-100 transition-colors">
+      <span>📊</span> Dashboard
+    </a>
+    <a href="/admin/profile" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-dark-100 transition-colors">
+      <span>👤</span> Profile
+    </a>
+    <a href="/admin/skills" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-dark-100 transition-colors">
+      <span>🛠️</span> Skills
+    </a>
+    <a href="/admin/projects" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-dark-100 transition-colors">
+      <span>💼</span> Projects
+    </a>
+    <a href="/admin/coding-profiles" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-dark-100 transition-colors">
+      <span>💻</span> Coding Profiles
+    </a>
+    <a href="/admin/experience" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-dark-100 transition-colors">
+      <span>💼</span> Experience
+    </a>
+    <a href="/admin/education" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-dark-100 transition-colors">
+      <span>🎓</span> Education
+    </a>
+    <a href="/admin/messages" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-dark-100 transition-colors">
+      <span>📬</span> Messages
+    </a>
+    <hr class="border-gray-700 my-4">
+    <button onclick="confirmLogout()" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-red-500/20 text-red-400 transition-colors">
+      <span>🚪</span> Logout
+    </button>
+  </nav>
+</aside>
+
+<script>
+  function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    const menuIcon = document.getElementById('menuIcon');
+    const closeIcon = document.getElementById('closeIcon');
+    
+    sidebar.classList.toggle('-translate-x-full');
+    overlay.classList.toggle('hidden');
+    menuIcon.classList.toggle('hidden');
+    closeIcon.classList.toggle('hidden');
+  }
+
+  function confirmLogout() {
+    showConfirmModal(
+      'Confirm Logout',
+      'Are you sure you want to logout from the admin panel?',
+      () => { window.location.href = '/admin/logout'; },
+      'Logout',
+      'bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700'
+    );
+  }
+</script>
