@@ -3,6 +3,7 @@ import express from 'express'
 import cors from 'cors'
 import mongoose from 'mongoose'
 import session from 'express-session'
+import MongoStore from 'connect-mongo'
 import path from 'path'
 import { fileURLToPath } from 'url'
 
@@ -29,12 +30,21 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(express.static(path.join(__dirname, 'public')))
 
-// Session
+// Session - Using MongoDB store for production
 app.use(session({
   secret: process.env.SESSION_SECRET || 'fallback-secret',
   resave: false,
   saveUninitialized: false,
-  cookie: { maxAge: 24 * 60 * 60 * 1000 } // 24 hours
+  store: new MongoStore({
+    mongoUrl: process.env.MONGODB_URI || 'mongodb://localhost:27017/tejas-portfolio',
+    touchAfter: 24 * 3600 // lazy session update (in seconds)
+  }),
+  cookie: { 
+    maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production', // HTTPS only in production
+    sameSite: 'lax'
+  }
 }))
 
 // Routes
