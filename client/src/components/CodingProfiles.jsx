@@ -143,8 +143,8 @@ const CodingProfiles = ({ profile }) => {
               <p className="text-gray-400 mt-1 sm:mt-2 text-xs sm:text-base">Platforms</p>
             </div>
             <div>
-              <p className="text-2xl sm:text-4xl font-bold gradient-text">Top 5%</p>
-              <p className="text-gray-400 mt-1 sm:mt-2 text-xs sm:text-base">Global Rank</p>
+              <p className="text-2xl sm:text-4xl font-bold gradient-text">42 Days</p>
+              <p className="text-gray-400 mt-1 sm:mt-2 text-xs sm:text-base">Longest Streak</p>
             </div>
           </div>
         </motion.div>
